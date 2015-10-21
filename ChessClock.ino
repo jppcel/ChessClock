@@ -2,8 +2,8 @@
 // Author : Joao Paulo Polles - http://github.com/jppcel
 // Thanks: Arduino e Cia
 
-#define NULL 0
-#define null 0
+#define NULL -1
+#define null -1
 
 // Include the library LedControl
 #include "LedControl.h"
@@ -23,162 +23,163 @@ void setup()
   Serial.begin(9600);
 }
 
-void setCaracter(int local, char digit[1], char *dp[1]){
-     int seg7;
-     switch(digit[1]){
-       case 'A':
-       case 'a':
-       seg7 = 0010000;
-        break;
-       
-     } 
-     if(*dp == "."){
-        lc.setRow(0,local,B1+(byte)seg7);
-     }else{
-        lc.setRow(0,local,B0+(byte)seg7);
-     }
-}
+/*void setWord(char Word[9], char Point[9], int num){
 
-void setCar(byte dig7, byte dig6, byte dig5, byte dig4, byte dig3, byte dig2, byte dig1, byte dig0){
-  if(dig7 != null){
-    lc.setRow(0,7,dig7);
-  }
-  if(dig6 != null){
-    lc.setRow(0,6,dig6);
-  }
-  if(dig5 != null){
-    lc.setRow(0,5,dig5);
-  }
-  if(dig4 != null){
-    lc.setRow(0,4,dig4);
-  }
-  if(dig3 != null){
-    lc.setRow(0,3,dig3);
-  }
-  if(dig2 != null){
-    lc.setRow(0,2,dig2);
-  }
-  if(dig1 != null){
-    lc.setRow(0,1,dig1);
-  }
-  if(dig0 != null){
-    lc.setRow(0,0,dig0);
-  }
-}
-
-byte concatByte(char init, int digit){
-  byte returnByte = init+digit;
-  return returnByte;
-}
-
-void serialWord(char Word[8]){
-  Serial.print(Word[0]);
-  Serial.print(Word[1]);
-  Serial.print(Word[2]);
-  Serial.print(Word[3]);
-  Serial.print(Word[4]);
-  Serial.print(Word[5]);
-  Serial.print(Word[6]);
-  Serial.print(Word[7]);
-}
-
-void setWord(char Word[8]){
+  
   int dig = 0;
   int local = 7;
   int Max = 7;
+  int dp;
+  int count = 0;
   char digit;
-  char dp;
 
   
   for(int i = Max; i >= 0; i--){
+    digit = Word[i];
 
-    
-   digit = Word[i];
-   dp = Word[i-1];
-   if((int)digit >= 0 && (int)digit <= 9){
-    // Set the number
-    if(Word[i-1] ==  '.'){
-      lc.setDigit(0,dig,(byte)digit,true);
-      i--;
+    if(Point[i] == '.'){
+      dp = 1;
     }else{
-      lc.setDigit(0,dig,(byte)digit,false);
+      dp = 0;
     }
-   }else{
+       
+    if(count >= num){
+      dp=1;
+    }
+    count++;
+  
+    byte seg7;
+    if(digit != -1 || count < num){
+      switch(digit){
+        case 'A':
+        case 'a':
+          if(dp == 1){ seg7 = B11110111; } else { seg7 = B01110111; }
+          break;
+        case 'B':
+        case 'b':
+          if(dp == 1){ seg7 = B10011111; } else { seg7 = B00011111; }
+          break;
+        case 'C':
+        case 'c':
+          if(dp == 1){ seg7 = B11001110; } else { seg7 = B01001110; }
+          break;
+        case 'D':
+        case 'd':
+          if(dp == 1){ seg7 = B10111101; } else { seg7 = B00111101; }
+          break;
+        case 'E':
+        case 'e':
+          if(dp == 1){ seg7 = B11001111; } else { seg7 = B01001111; }
+          break;
+        case 'F':
+        case 'f':
+          if(dp == 1){ seg7 = B11000111; } else { seg7 = B01000111; }
+          break;
+        case 'G':
+        case 'g':
+        case '6':
+          if(dp == 1){ seg7 = B11011111; } else { seg7 = B01011111; }
+          break;
+        case 'H':
+        case 'h':
+          if(dp == 1){ seg7 = B10110111; } else { seg7 = B00110111; }
+          break;
+        case 'I':
+        case 'i':
+          if(dp == 1){ seg7 = B10010000; } else { seg7 = B00010000; }
+          break;
+        case 'J':
+        case 'j':
+          if(dp == 1){ seg7 = B10111000; } else { seg7 = B00111000; }
+          break;
+        case 'L':
+        case 'l':
+          if(dp == 1){ seg7 = B10001110; } else { seg7 = B00001110; }
+          break;
+      }
+    }else{
+      seg7 = B00000000;
+    }
+  
+    /*byte dis = seg7;
+          
+    if(dp == '.'){
+      lc.setRow(0,local,concatByte('B1',seg7));
+    }else{
+      lc.setRow(0,local,concatByte('B0',seg7));
+    }
+  
+  
+  
+    lc.setRow(0, dig, seg7);
+    Serial.println(dig+" - "+digit);
+  }
+  local--;
+  dig++;
+  count++;
+}*/
 
+void setDig(char Word[8], char Point[8], int num){
 
-      /*char seg7[8];
-     switch(digit){
-       case 'A':
-       case 'a':
-        seg7 = "0010000";
-        break;
-       case 'B':
-       case 'b':
-        seg7 = "0011111";
-        break;
-       case 'C':
-       case 'c':
-        seg7 = "1001110";
-        break;
-       case 'D':
-       case 'd':
-        seg7 = "0111101";
-        break;
-       case 'E':
-       case 'e':
-        seg7 = "1001111";
-        break;
-       case 'F':
-       case 'f':
-        seg7 = "1000111";
-        break;
-       case 'G':
-       case 'g':
-       case '6':
-        seg7 = "1011111";
-        break;
-       case 'H':
-       case 'h':
-        seg7 = "0110111";
-        break;
-     } */
+  
+  int dig = 0;
+  int local = 7;
+  int Max = 7;
+  int dp;
+  int count = 0;
+  char digit;
 
-     /*byte dis = seg7;
-        
-     if(dp == '.'){
-       lc.setRow(0,local,concatByte('B1',seg7));
-     }else{
-       lc.setRow(0,local,concatByte('B0',seg7));
-     }*/
+  
+  for(int i = Max; i >= 0; i--){
+    digit = Word[i];
 
+    if(Point[i] == '.'){
+      dp = 1;
+    }else{
+      dp = 0;
+    }
 
-
-     lc.setChar(0, dig, digit, false);
-     Serial.println(local);
-
-    
-   }
-   local--; 
-   dig++;
+    if(digit == '0'){
+      if(dp == 1){ lc.setRow(0, dig, B11111110); } else { lc.setRow(0, dig, B01111110); }
+    }
+    if(digit == '1'){
+      if(dp == 1){ lc.setRow(0, dig, B10110000); } else { lc.setRow(0, dig, B00110000); }
+    }
+    if(digit == '2'){
+      if(dp == 1){ lc.setRow(0, dig, B11101101); } else { lc.setRow(0, dig, B01101101); }
+    }
+    if(digit == '3'){
+      if(dp == 1){ lc.setRow(0, dig, B11111001); } else { lc.setRow(0, dig, B01111001); }
+    }
+    if(digit == '4'){
+      if(dp == 1){ lc.setRow(0, dig, B10110011); } else { lc.setRow(0, dig, B00110011); }
+    }
+    if(digit == '5'){
+      if(dp == 1){ lc.setRow(0, dig, B11011011); } else { lc.setRow(0, dig, B01011011); }
+    }
+    if(digit == '6'){
+      if(dp == 1){ lc.setRow(0, dig, B11011111); } else { lc.setRow(0, dig, B01011111); }
+    }
+    if(digit == '7'){
+      if(dp == 1){ lc.setRow(0, dig, B11110000); } else { lc.setRow(0, dig, B01110000); }
+    }
+    if(digit == '8'){
+      if(dp == 1){ lc.setRow(0, dig, B11111111); } else { lc.setRow(0, dig, B01111111); }
+    }
+    if(digit == '9'){
+      if(dp == 1){ lc.setRow(0, dig, B11111011); } else { lc.setRow(0, dig, B01111011); }
+    }
+  
+    local--;
+    dig++;
+    count++;
   }
 }
 
 int trying = true;
 void loop(){
   while(trying){
-    //setCar(B00111000,B01100111,B01100111,B01001110,B01001111,B00001110,null,null);
-    //lc.setRow(0,7,B1110000);
-    //lc.setChar(0,7,'a',false);
-    //setWord("1111");
-    /*lc.setDigit(0,0,1,false);
-    lc.setDigit(0,1,2,false);
-    lc.setDigit(0,2,3,true);
-    lc.setDigit(0,3,4,false);
-    lc.setDigit(0,4,5,false);
-    lc.setDigit(0,5,6,false);
-    lc.setDigit(0,6,7,true);
-    lc.setDigit(0,7,8,false);*/
-    setWord("arduino1");
+    setDig("03000300", "0.000.00", 8);
     trying = false;
   }
 
