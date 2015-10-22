@@ -16,7 +16,7 @@ void setup()
   // Initializes the module
   lc.shutdown(0,false);
   // Adjust the display brightness
-  lc.setIntensity(0,2);
+  lc.setIntensity(0,14);
   // Clear the display
   lc.clearDisplay(0);
 
@@ -58,6 +58,12 @@ void setup()
   boolean Step1 = true;
   boolean Step2 = false;
   boolean Step3 = false;
+
+  int sideTime = -1;
+
+  int setDelay = 97;
+  char points;
+  char Point[9];
 
 
   boolean Introduction = true;
@@ -165,7 +171,7 @@ void setDig(char Word[8], char Point[8], int num){
   }
 }
 
-void setNum(char Point[8], int num){
+void setNum(int num){
 
 
   
@@ -183,9 +189,6 @@ void setNum(char Point[8], int num){
       Serial.print(Toshow[j]);
     }
   }*/
-  Serial.println(programSeconds);
-
-
   
   for(int i = Max; i >= 0; i--){
     
@@ -447,6 +450,79 @@ void setPers(){
 }
 
 
+
+void endOfTime(int side, int Time){
+  // Verify if the sideTime is setted, if setted, make nothing
+  if(sideTime == -1){
+    // Set the var with the side of the end the time, to show with this time is out.
+    if(Time <= 0){
+      sideTime = side;
+    }
+  }
+}
+
+int modifyCounter = 0;
+void modifyPoints(){
+  if(sideTime == -1){
+        Point[0] = '0';
+        Point[1] = '.';
+        Point[2] = '0';
+        Point[3] = '0';
+        Point[4] = '0';
+        Point[5] = '.';
+        Point[6] = '0';
+        Point[7] = '0';
+  }else{
+    if(sideTime == 0){
+      if(modifyCounter == 1){
+        Point[0] = '0';
+        Point[1] = '0';
+        Point[2] = '0';
+        Point[3] = '0';
+        Point[4] = '0';
+        Point[5] = '.';
+        Point[6] = '0';
+        Point[7] = '0';
+        modifyCounter = 0;
+      }else{
+        points = '....0.00';
+        Point[0] = '.';
+        Point[1] = '.';
+        Point[2] = '.';
+        Point[3] = '.';
+        Point[4] = '0';
+        Point[5] = '.';
+        Point[6] = '0';
+        Point[7] = '0';
+        modifyCounter = 1;
+      }
+    }else{
+      if(modifyCounter == 1){
+        Point[0] = '0';
+        Point[1] = '.';
+        Point[2] = '0';
+        Point[3] = '0';
+        Point[4] = '0';
+        Point[5] = '0';
+        Point[6] = '0';
+        Point[7] = '0';
+        modifyCounter = 0;
+      }else{
+        Point[0] = '0';
+        Point[1] = '.';
+        Point[2] = '0';
+        Point[3] = '0';
+        Point[4] = '.';
+        Point[5] = '.';
+        Point[6] = '.';
+        Point[7] = '.';
+        modifyCounter = 1;
+      }
+    }
+  }
+}
+
+
 void introduction(){
   if(Introduction){
     lc.setRow(0, 7, B00000001);
@@ -589,7 +665,7 @@ void step2(){
             
           switch(a2){
             case 1:  
-              setDig("00030000", "0.000000", 8);
+              setDig("00010000", "0.000000", 8);
               programSeconds = toMiliseconds(0,3,0);
               programAdd = 0;
               programAddSeconds = 0;
@@ -757,9 +833,11 @@ void step3(){
 
 void step3_sA(){
   toDisplayTime(time1,time2);
-  setNum("0.000.00", 8);
-  delay(97);
+  modifyPoints();
+  setNum(8);
+  delay(setDelay);
   if(start){
+    
     if(digitalRead(btnNegras) == 1){
        time1 = time1 - 1;
         if(player == 1){
@@ -771,6 +849,7 @@ void step3_sA(){
           player = 1;
         }
     }
+    
     if(timesButton == 0){
       if(digitalRead(btn3) == 1){
          start = false;
@@ -779,6 +858,9 @@ void step3_sA(){
     }else{
       timesButton--;
     }
+    
+    endOfTime(0, time1);
+    endOfTime(1, time2);
   }else{
     if(delayButton){
       delay(300);
@@ -794,22 +876,26 @@ void step3_sA(){
 
 void step3_cA(){
   toDisplayTime(time1,time2);
-  setNum("0.000.00", 8);
-  delay(97);
+  modifyPoints();
+  setNum(8);
+  delay(setDelay);
   if(start){
+    
     if(digitalRead(btnNegras) == 1){
-       time1 = time1 - 1;
-        if(player == 1){
-          player = 0;
-          time1 = time1 + toMiliseconds(0,0,programAddSeconds);
-        }
+       if(time1>0){ time1 = time1 - 1; } 
     }else{
-       time2 = time2 - 1;
-        if(player == 0){
-          player = 1;
-          time2 = time2 + toMiliseconds(0,0,programAddSeconds);
-        }
+       if(time2>0){ time2 = time2 - 1; } 
     }
+    
+    if(player == 1 && digitalRead(btnNegras) == 1){
+      player = 0;
+      time2 = time2 + toMiliseconds(0,0,programAddSeconds);
+    }
+    if(player == 0 && digitalRead(btnNegras) == 0){
+      player = 1;
+      time1 = time1 + toMiliseconds(0,0,programAddSeconds);
+    }
+    
     if(timesButton == 0){
       if(digitalRead(btn3) == 1){
          start = false;
@@ -818,6 +904,9 @@ void step3_cA(){
     }else{
       timesButton--;
     }
+    
+    endOfTime(0, time1);
+    endOfTime(1, time2);
   }else{
     if(delayButton){
       delay(300);
