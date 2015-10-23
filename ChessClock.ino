@@ -52,7 +52,7 @@ void setup()
   int btnNegras = 12;
 
   int numStep = 1;
-  int programSeconds = 0;
+  long programSeconds = 0;
   int programAdd = 0;
   int programAddSeconds = 0;
   boolean Step1 = true;
@@ -67,6 +67,11 @@ void setup()
 
 
   boolean Introduction = true;
+
+  // Debug on Serial
+  boolean Debug_toDisplayTime = false;
+    boolean Debug_toDisplayTime_others = false;
+  boolean Debug = false;
 
 void setCar(byte dig7, byte dig6, byte dig5, byte dig4, byte dig3, byte dig2, byte dig1, byte dig0){
  if(dig7 != null){
@@ -108,7 +113,7 @@ void setDig(char Word[8], char Point[8], int num){
   int count = 0;
   char digit;
 
-  Serial.println(Word);
+  //Serial.println(Word);
 
   
   for(int i = Max; i >= 0; i--){
@@ -263,17 +268,20 @@ void returnStep(){
   }
 }
 
-int toSeconds(int hours, int minutes, int seconds){
-  int total = seconds;
+long toSeconds(int hours, int minutes, int seconds){
+  long total = seconds;
   total = total + (minutes*60);
   total = total + (hours*60*60);
   return total;
 }
 
-int toMiliseconds(int hours, int minutes, int seconds){
-  int total = seconds;
+long toMiliseconds(int hours, int minutes, int seconds){
+  long total = seconds;
+  Serial.println(total);
   total = total + (minutes*60);
+  Serial.println(total);
   total = total + (hours*60*60);
+  Serial.println(total);
   return total*10;
 }
 
@@ -363,28 +371,52 @@ void toShow(int seconds1, int seconds2){
 
 
 
-void toDisplayTime(int seconds1, int seconds2){
-    int hours, secHours, minutes, Seconds;
-    int H[2], SH[2], M[2], S[2], seconds[2];
+void toDisplayTime(long seconds1, long seconds2){
+    long hours, secHours, minutes, Seconds, seconds[2];
+    int H[2], SH[2], M[2], S[2];
 
     seconds[0] = seconds1/10;
+      if(Debug_toDisplayTime_others){
+        Serial.println(seconds1);
+        Serial.println(seconds[0]);
+        Serial.println("------");
+      }
     seconds[1] = seconds2/10;
+      if(Debug_toDisplayTime_others){
+        Serial.println(seconds2);
+        Serial.println(seconds[0]);
+        Serial.println("------");
+      }
 
     
   for(int i=0; i<2; i++){
     hours = (int)(seconds[i]/60)/60;
+      if(Debug_toDisplayTime_others){
+        Serial.println(seconds[i]);
+        Serial.println(seconds[i]/60);
+        Serial.println((seconds[i]/60)/60);
+      }
     
     //Caracters on the arrays
     if(hours == 0){
       H[0] = 0;
       H[1] = 0;
+      if(Debug_toDisplayTime_others){
+        Serial.println("hours == 0");
+      }
     }else{
       if(hours >= 10){
         H[0] = (int) hours/10;
         H[1] = hours-(H[0]*10);
+        if(Debug_toDisplayTime_others){
+          Serial.println("hours >= 0");
+        } 
       }else{
         H[0] = 0;
         H[1] = hours;
+        if(Debug_toDisplayTime_others){
+          Serial.println("!(hours >= 10) && (hours != 0)");
+        }
       }
     }
     
@@ -395,13 +427,22 @@ void toDisplayTime(int seconds1, int seconds2){
     if(minutes == 0){
       M[0] = 0;
       M[1] = 0;
+      if(Debug_toDisplayTime_others){
+        Serial.println("minutes == 0");
+      }
     }else{
       if(minutes >= 10){
         M[0] = (int) minutes/10;
         M[1] = minutes - (M[0]*10);
+        if(Debug_toDisplayTime_others){
+          Serial.println("minutes >= 0");
+        } 
       }else{
         M[0] = 0;
         M[1] = minutes;
+        if(Debug_toDisplayTime_others){
+          Serial.println("!(minutes >= 10) && (minutes != 0)");
+        }
       }
     }
     
@@ -411,13 +452,22 @@ void toDisplayTime(int seconds1, int seconds2){
     if(seconds == 0){
       S[0] = 0;
       S[1] = 0;
+      if(Debug_toDisplayTime_others){
+        Serial.println("seconds == 0");
+      }
     }else{
       if(Seconds >= 10){
         S[0] = (int) Seconds/10;
         S[1] = Seconds - (S[0]*10);
+        if(Debug_toDisplayTime_others){
+          Serial.println("seconds >= 0");
+        } 
       }else{
         S[0] = 0;
         S[1] = Seconds;
+        if(Debug_toDisplayTime_others){
+          Serial.println("!(seconds >= 10) && (seconds != 0)");
+        }
       }
     }
 
@@ -428,13 +478,40 @@ void toDisplayTime(int seconds1, int seconds2){
     }else{
       add = 4;
     }
-
-    if(H[1] >= 1){
+    
+    //Serial.println(seconds[i]);
+    if(seconds[i] >= 3600){
+      if(Debug_toDisplayTime){
+        if(i == 0){
+          Serial.print(H[0]);
+          Serial.print(H[1]);
+          Serial.print(M[0]);
+          Serial.print(M[1]);
+        }else{
+          Serial.print(H[0]);
+          Serial.print(H[1]);
+          Serial.print(M[0]);
+          Serial.println(M[1]);
+        }
+      }
       Toshow[0+add] = H[0];
       Toshow[1+add] = H[1];
       Toshow[2+add] = M[0];
       Toshow[3+add] = M[1];
     }else{
+      if(Debug){
+        if(i == 0){
+          Serial.print(M[0]);
+          Serial.print(M[1]);
+          Serial.print(S[0]);
+          Serial.print(S[1]);
+        }else{
+          Serial.print(M[0]);
+          Serial.print(M[1]);
+          Serial.print(S[0]);
+          Serial.println(S[1]);
+        }
+      }
       Toshow[0+add] = M[0];
       Toshow[1+add] = M[1];
       Toshow[2+add] = S[0];
@@ -451,7 +528,7 @@ void setPers(){
 
 
 
-void endOfTime(int side, int Time){
+void endOfTime(int side, long Time){
   // Verify if the sideTime is setted, if setted, make nothing
   if(sideTime == -1){
     // Set the var with the side of the end the time, to show with this time is out.
@@ -462,16 +539,55 @@ void endOfTime(int side, int Time){
 }
 
 int modifyCounter = 0;
+
+int player;
+long time1;
+long time2;
+boolean start = false;
+boolean started = false;
+
+int more1Hour = 0;
 void modifyPoints(){
   if(sideTime == -1){
+        //0.000.00
         Point[0] = '0';
-        Point[1] = '.';
         Point[2] = '0';
         Point[3] = '0';
         Point[4] = '0';
-        Point[5] = '.';
         Point[6] = '0';
         Point[7] = '0';
+        if(time1 > 36000 && player == 0 && started == true){
+            if(more1Hour < 5){
+              Point[1] = '.';
+              more1Hour++;
+            }else{
+              if(more1Hour == 10){
+                Point[1] = '0';
+                more1Hour = 0;
+              }else{
+              Point[1] = '0';
+              more1Hour++;
+            }
+            }
+        }else{
+          Point[1] = '.';
+        }
+        if(time2 > 36000 && player == 1 && started == true){
+          if(more1Hour < 5){
+            Point[5] = '.';
+            more1Hour++;
+          }else{
+            if(more1Hour == 10){
+              Point[5] = '0';
+              more1Hour = 0;
+            }else{
+              Point[5] = '0';
+              more1Hour++;
+            }
+          }
+        }else{
+          Point[5] = '.';
+        }
   }else{
     if(sideTime == 0){
       if(modifyCounter == 1){
@@ -522,7 +638,7 @@ void modifyPoints(){
   }
 }
 
-
+// Here init the part of the code where shows on the display really...
 void introduction(){
   if(Introduction){
     lc.setRow(0, 7, B00000001);
@@ -683,7 +799,7 @@ void step2(){
               programAddSeconds = 0;
               break;
             case 4:  
-              setDig("00150000", "0.000000", 8);
+              setDig("00150000", "0.000000", 8);  
               programSeconds = toMiliseconds(0,15,0);
               programAdd = 0;
               programAddSeconds = 0;
@@ -710,6 +826,8 @@ void step2(){
               setCar(B01100111,B01001111,B00000101,B11011011,B00000000,B00000000,B00000000,B00000000);
               break;
           }
+          
+          Serial.println(programSeconds);
         }
       }else{
         delay(200);
@@ -758,7 +876,6 @@ void step2(){
           }
         }
         if(btn == 1){
-            
           switch(a2){
             case 1:  
               setDig("00030002", "0.000.00", 8);
@@ -782,6 +899,8 @@ void step2(){
               setCar(B01100111,B01001111,B00000101,B11011011,B00000000,B00000000,B00000000,B00000000);
               break;
           }
+          
+          Serial.println(programSeconds);
         }
       }else{
         delay(200);
@@ -795,14 +914,6 @@ void step2(){
     }
   }
 }
-
-    int time1 = programSeconds;
-    int time2 = programSeconds;
-
-    int player;
-
-    boolean start = false;
-    boolean started = false;
 
     boolean led = false;
 
@@ -831,6 +942,7 @@ void step3(){
   }
 }
 
+//Without add
 void step3_sA(){
   toDisplayTime(time1,time2);
   modifyPoints();
@@ -870,10 +982,16 @@ void step3_sA(){
        start = true;
        started = true;
        timesButton = 3;
+       if(digitalRead(btnNegras == 1)){
+        player = 0;
+       }else{
+        player = 1;        
+       }
     }
   }
 }
 
+//With add
 void step3_cA(){
   toDisplayTime(time1,time2);
   modifyPoints();
@@ -889,11 +1007,11 @@ void step3_cA(){
     
     if(player == 1 && digitalRead(btnNegras) == 1){
       player = 0;
-      time2 = time2 + toMiliseconds(0,0,programAddSeconds);
+      if(time2>0){ time2 = time2 + toMiliseconds(0,0,programAddSeconds); }
     }
     if(player == 0 && digitalRead(btnNegras) == 0){
       player = 1;
-      time1 = time1 + toMiliseconds(0,0,programAddSeconds);
+      if(time1>0){  time1 = time1 + toMiliseconds(0,0,programAddSeconds); }
     }
     
     if(timesButton == 0){
@@ -916,6 +1034,13 @@ void step3_cA(){
        start = true;
        started = true;
        timesButton = 3;
+       if(digitalRead(btnNegras == 1) && started == 0){
+        player = 0;
+       }else{
+        if(digitalRead(btnNegras == 0) && started == 0){
+          player = 1;  
+        }      
+       }
     }
   }
 }
