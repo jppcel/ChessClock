@@ -556,36 +556,41 @@ void modifyPoints(){
         Point[4] = '0';
         Point[6] = '0';
         Point[7] = '0';
-        if(time1 > 36000 && player == 0 && started == true){
+        if(start){
+          if(time1 > 36000 && player == 0 && started == true){
+              if(more1Hour < 5){
+                Point[1] = '.';
+                more1Hour++;
+              }else{
+                if(more1Hour == 10){
+                  Point[1] = '0';
+                  more1Hour = 0;
+                }else{
+                Point[1] = '0';
+                more1Hour++;
+              }
+              }
+          }else{
+            Point[1] = '.';
+          }
+          if(time2 > 36000 && player == 1 && started == true){
             if(more1Hour < 5){
-              Point[1] = '.';
+              Point[5] = '.';
               more1Hour++;
             }else{
               if(more1Hour == 10){
-                Point[1] = '0';
+                Point[5] = '0';
                 more1Hour = 0;
               }else{
-              Point[1] = '0';
-              more1Hour++;
+                Point[5] = '0';
+                more1Hour++;
+              }
             }
-            }
-        }else{
-          Point[1] = '.';
-        }
-        if(time2 > 36000 && player == 1 && started == true){
-          if(more1Hour < 5){
-            Point[5] = '.';
-            more1Hour++;
           }else{
-            if(more1Hour == 10){
-              Point[5] = '0';
-              more1Hour = 0;
-            }else{
-              Point[5] = '0';
-              more1Hour++;
-            }
+            Point[5] = '.';
           }
         }else{
+          Point[1] = '.';
           Point[5] = '.';
         }
   }else{
@@ -781,7 +786,7 @@ void step2(){
             
           switch(a2){
             case 1:  
-              setDig("00010000", "0.000000", 8);
+              setDig("00030000", "0.000000", 8);
               programSeconds = toMiliseconds(0,3,0);
               programAdd = 0;
               programAddSeconds = 0;
